@@ -1,0 +1,44 @@
+{
+  "name": "scholarly-js",
+  "version": "0.1.0",
+  "description": "TypeScript library inspired by scholarly for retrieving Google Scholar author and publication metadata.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run build"
+  },
+  "keywords": [
+    "google-scholar",
+    "scholarly",
+    "typescript",
+    "citation",
+    "academic"
+  ],
+  "license": "Unlicense",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "bibtex-parse-js": "^0.0.24",
+    "cheerio": "^1.1.2",
+    "undici": "^6.21.3"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
+  }
+}
