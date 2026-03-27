@@ -199,10 +199,8 @@ export class ProxyGenerator {
   }
 
   private isNodeRuntime(): boolean {
-    return (
-      typeof process !== "undefined" &&
-      !!(process as { versions?: { node?: string } }).versions?.node
-    );
+    const g = globalThis as { process?: { versions?: { node?: string } } };
+    return !!g.process?.versions?.node;
   }
 
   private normalizeProxyUrl(raw: string): string {
