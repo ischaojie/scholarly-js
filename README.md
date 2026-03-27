@@ -96,3 +96,21 @@ npm run check
 ```
 
 构建产物输出在 `dist/`。
+
+## GitHub Actions 自动发布 npm
+
+项目已内置：
+
+- `.github/workflows/ci.yml`：PR/Push 到 `main` 时执行 `npm run check`
+- `.github/workflows/release.yml`：Push 到 `main` 时，若 `package.json` 里的版本还未发布到 npm，则自动发布
+
+你只需要在 GitHub 仓库配置 Secret：
+
+- `NPM_TOKEN`：npm access token（建议使用 Automation token）
+
+发布规则：
+
+1. 修改 `package.json` 的 `version`（例如 `0.1.0` -> `0.1.1`）
+2. 合并到 `main`
+3. Action 会检查 `npm view <name>@<version>` 是否存在
+4. 若不存在则执行 `npm publish --access public --provenance`
