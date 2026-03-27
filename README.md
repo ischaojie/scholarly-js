@@ -100,23 +100,3 @@ npm run check
 
 Build output is generated in `dist/`.
 
-## GitHub Actions: npm Auto Publish
-
-Included workflows:
-
-- `.github/workflows/ci.yml`: runs `npm run check` on PR and push to `main`
-- `.github/workflows/release.yml`: on push to `main`, publishes only when the package version does not already exist on npm
-
-OIDC mode does not need `NPM_TOKEN`. Configure npm Trusted Publisher:
-
-1. Open npm package settings
-2. Open `Trusted publishers`
-3. Choose GitHub provider and bind your repository + workflow (`release.yml`)
-4. Save
-
-Release flow:
-
-1. Bump `package.json` version (`0.1.0` -> `0.1.1`)
-2. Merge to `main`
-3. Action checks whether `<name>@<version>` already exists on npm
-4. If not, it runs `npm publish --access public --provenance`

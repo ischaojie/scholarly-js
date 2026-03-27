@@ -100,23 +100,3 @@ npm run check
 
 构建产物输出在 `dist/`。
 
-## GitHub Actions 自动发布 npm
-
-内置工作流：
-
-- `.github/workflows/ci.yml`：PR 和 push 到 `main` 时执行 `npm run check`
-- `.github/workflows/release.yml`：push 到 `main` 时，仅当该版本尚未发布到 npm 才执行发布
-
-OIDC 模式不需要 `NPM_TOKEN`。请在 npm 配置 Trusted Publisher：
-
-1. 打开 npm 包设置
-2. 打开 `Trusted publishers`
-3. 选择 GitHub provider，绑定仓库和 workflow（`release.yml`）
-4. 保存
-
-发布流程：
-
-1. 修改 `package.json` 版本号（如 `0.1.0` -> `0.1.1`）
-2. 合并到 `main`
-3. Action 检查 `<name>@<version>` 是否已存在于 npm
-4. 若不存在则执行 `npm publish --access public --provenance`

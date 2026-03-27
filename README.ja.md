@@ -100,23 +100,3 @@ npm run check
 
 ビルド成果物は `dist/` に出力されます。
 
-## GitHub Actions による npm 自動公開
-
-同梱ワークフロー:
-
-- `.github/workflows/ci.yml`: PR と `main` への push で `npm run check`
-- `.github/workflows/release.yml`: `main` への push 時、npm に同バージョンが存在しない場合のみ公開
-
-OIDC モードでは `NPM_TOKEN` は不要です。npm の Trusted Publisher を設定してください。
-
-1. npm パッケージ設定を開く
-2. `Trusted publishers` を開く
-3. GitHub provider を選び、リポジトリと workflow（`release.yml`）を紐付ける
-4. 保存
-
-公開フロー:
-
-1. `package.json` のバージョンを更新（例: `0.1.0` -> `0.1.1`）
-2. `main` へマージ
-3. Action が `<name>@<version>` の存在を確認
-4. 未公開なら `npm publish --access public --provenance` を実行
