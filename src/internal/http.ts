@@ -1,6 +1,6 @@
 import { load } from "cheerio";
 import { sleep, toAbsoluteUrl } from "./utils";
-import { ProxyGenerator } from "../proxy";
+import type { ProxyGenerator } from "../proxy";
 
 interface RequestOptions {
   timeoutMs: number;
@@ -83,7 +83,7 @@ export class ScholarHttp {
 
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), this.options.timeoutMs);
-      const proxyRuntime = manager?.getRuntime(absoluteUrl);
+      const proxyRuntime = manager ? await manager.getRuntime(absoluteUrl) : undefined;
       const requestUrl = proxyRuntime?.url ?? absoluteUrl;
 
       try {

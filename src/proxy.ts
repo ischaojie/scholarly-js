@@ -1,5 +1,3 @@
-import { ProxyAgent, type Dispatcher } from "undici";
-
 export type ProxyMode =
   | "NONE"
   | "SINGLEPROXY"
@@ -11,7 +9,7 @@ export type ProxyMode =
 export interface ProxyRuntime {
   url: string;
   headers?: Record<string, string>;
-  dispatcher?: Dispatcher;
+  dispatcher?: unknown;
   proxyId?: string;
 }
 
@@ -37,7 +35,7 @@ export class ProxyGenerator {
     render?: boolean;
   };
 
-  private dispatcherCache = new Map<string, Dispatcher>();
+  private dispatcherCache = new Map<string, unknown>();
 
   SingleProxy(http?: string, https?: string): boolean {
     const raw = https ?? http;
@@ -118,7 +116,7 @@ export class ProxyGenerator {
     return this.proxy_mode !== "NONE";
   }
 
-  getRuntime(targetUrl: string): ProxyRuntime {
+  async getRuntime(targetUrl: string): Promise<ProxyRuntime> {
     if (this.proxy_mode === "SCRAPERAPI" && this.scraperApi) {
       return this.buildScraperApiRuntime(targetUrl);
     }
@@ -130,7 +128,7 @@ export class ProxyGenerator {
 
     return {
       url: targetUrl,
-      dispatcher: this.getDispatcher(proxy),
+      dispatcher: await this.getDispatcher(proxy),
       proxyId: proxy,
     };
   }
@@ -183,12 +181,28 @@ export class ProxyGenerator {
     return undefined;
   }
 
-  private getDispatcher(proxyUrl: string): Dispatcher {
+  private async getDispatcher(proxyUrl: string): Promise<unknown> {
     const cached = this.dispatcherCache.get(proxyUrl);
     if (cached) return cached;
-    const dispatcher = new ProxyAgent(proxyUrl);
+
+    if (!this.isNodeRuntime()) {
+      throw new Error(
+        "ProxyAgent is only available in Node.js runtime. Do not call use_proxy() in browser builds.",
+      );
+    }
+
+    const modName = "undici";
+    const undici = await import(/* @vite-ignore */ modName);
+    const dispatcher = new undici.ProxyAgent(proxyUrl);
     this.dispatcherCache.set(proxyUrl, dispatcher);
     return dispatcher;
+  }
+
+  private isNodeRuntime(): boolean {
+    return (
+      typeof process !== "undefined" &&
+      !!(process as { versions?: { node?: string } }).versions?.node
+    );
   }
 
   private normalizeProxyUrl(raw: string): string {

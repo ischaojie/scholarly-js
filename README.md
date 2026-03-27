@@ -1,16 +1,18 @@
 # scholarly-js
 
-`scholarly-js` 是一个基于 TypeScript 的 Google Scholar 抓取库，参考了 Python 项目 [scholarly](https://github.com/scholarly-python-package/scholarly) 的核心接口风格。
+English | [简体中文](./README.zh-CN.md) | [日本語](./README.ja.md)
 
-> 注意：Google Scholar 对自动化请求有严格限制，频繁请求可能触发验证码或 IP 封禁。请控制请求频率，并自行评估合规风险。
+`scholarly-js` is a TypeScript library for retrieving Google Scholar author/publication metadata, inspired by Python [scholarly](https://github.com/scholarly-python-package/scholarly).
 
-## 安装
+> Note: Google Scholar has strict anti-bot controls. High-frequency requests may trigger CAPTCHA or IP blocks. Use responsibly.
+
+## Install
 
 ```bash
 npm install scholarly-js
 ```
 
-## 快速开始
+## Quick Start
 
 ```ts
 import { scholarly } from "scholarly-js";
@@ -40,16 +42,16 @@ if (firstPub) {
 }
 ```
 
-## 代理（ProxyGenerator）
+## Proxy (ProxyGenerator)
 
-与 Python `scholarly` 一样，可以先创建 `ProxyGenerator` 再注入到 `scholarly`：
+Like Python `scholarly`, you can create a `ProxyGenerator` and inject it into `scholarly`:
 
 ```ts
 import { ProxyGenerator, scholarly } from "scholarly-js";
 
 const pg = new ProxyGenerator();
 pg.ScraperAPI(process.env.SCRAPER_API_KEY!);
-// 也支持：
+// Also supported:
 // pg.SingleProxy("http://user:pass@host:port");
 // await pg.FreeProxies();
 // pg.Luminati("user", "pass", 22225);
@@ -58,9 +60,10 @@ pg.ScraperAPI(process.env.SCRAPER_API_KEY!);
 scholarly.use_proxy(pg);
 ```
 
-`use_proxy(primary, secondary)` 也支持双代理模式，语义与 Python 版一致：`/citations` 相关请求优先走 secondary，其余走 primary。
+`use_proxy(primary, secondary)` also supports dual-proxy mode. `/citations` requests prefer secondary, others use primary.
+Proxy configuration is Node-runtime oriented; do not call `use_proxy()` in browser-only builds.
 
-## API 对照（核心）
+## Core API
 
 - `searchAuthor(name)`
 - `searchAuthorId(id, filled?, options?)`
@@ -81,39 +84,39 @@ scholarly.use_proxy(pg);
 - `bibtex(publication)`
 - `pprint(entity)`
 
-同时提供 Python 风格别名：如 `search_author`、`search_pubs`、`search_single_pub`、`search_citedby`、`citedby` 等。
+Python-style aliases are also available: `search_author`, `search_pubs`, `search_single_pub`, `search_citedby`, `citedby`, etc.
 
-## 主要差异（相对 Python scholarly）
+## Differences from Python scholarly
 
-- 目前未实现 Python 版的代理生成器生态（如 `ProxyGenerator`）。
-- `fill()` 对 Author 支持的 section 为：`basics / indices / counts / coauthors / publications`。
-- `citedBy` 和搜索接口采用 `AsyncGenerator`（`for await ... of` 或 `iterator.next()`）。
+- Proxy ecosystem (`ProxyGenerator`) is implemented, but some features are compatibility-focused (for example Tor internal process management is not implemented).
+- `fill()` for Author supports: `basics / indices / counts / coauthors / publications`.
+- Search and citation APIs use `AsyncGenerator`.
 
-## 本地开发
+## Local Development
 
 ```bash
 npm run check
 ```
 
-构建产物输出在 `dist/`。
+Build output is generated in `dist/`.
 
-## GitHub Actions 自动发布 npm
+## GitHub Actions: npm Auto Publish
 
-项目已内置：
+Included workflows:
 
-- `.github/workflows/ci.yml`：PR/Push 到 `main` 时执行 `npm run check`
-- `.github/workflows/release.yml`：Push 到 `main` 时，若 `package.json` 里的版本还未发布到 npm，则自动发布（OIDC）
+- `.github/workflows/ci.yml`: runs `npm run check` on PR and push to `main`
+- `.github/workflows/release.yml`: on push to `main`, publishes only when the package version does not already exist on npm
 
-OIDC 模式下不需要 `NPM_TOKEN`。你需要在 npm 后台把包配置为 Trusted Publisher：
+OIDC mode does not need `NPM_TOKEN`. Configure npm Trusted Publisher:
 
-1. 进入 npm 包设置（Package settings）
-2. 打开 `Trusted publishers`
-3. 选择 GitHub provider，并绑定你的仓库与 workflow（`release.yml`）
-4. 保存后，GitHub Action 会用 OIDC 身份直接发布
+1. Open npm package settings
+2. Open `Trusted publishers`
+3. Choose GitHub provider and bind your repository + workflow (`release.yml`)
+4. Save
 
-发布规则：
+Release flow:
 
-1. 修改 `package.json` 的 `version`（例如 `0.1.0` -> `0.1.1`）
-2. 合并到 `main`
-3. Action 会检查 `npm view <name>@<version>` 是否存在
-4. 若不存在则执行 `npm publish --access public --provenance`
+1. Bump `package.json` version (`0.1.0` -> `0.1.1`)
+2. Merge to `main`
+3. Action checks whether `<name>@<version>` already exists on npm
+4. If not, it runs `npm publish --access public --provenance`

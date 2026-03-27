@@ -2,7 +2,7 @@ import { AuthorParser } from "./parsers/author";
 import { PublicationParser } from "./parsers/publication";
 import { ScholarHttp } from "./internal/http";
 import { cleanText, getUrlParam } from "./internal/utils";
-import { ProxyGenerator } from "./proxy";
+import type { ProxyGenerator } from "./proxy";
 import type {
   Author,
   FillAuthorOptions,
